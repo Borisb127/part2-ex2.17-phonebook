@@ -14,7 +14,6 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [nameFilter, setNameFilter] = useState('');
   const [addedMessage, setaddedMessage] = useState(null);
-  //const [addedMessage, setaddedMessage] = useState(null);
 
 
 

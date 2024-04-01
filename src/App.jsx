@@ -8,12 +8,14 @@ import Notification from './components/Notification'
 import personsService from './services/persons.js';
 
 const App = () => {
+
   // State declarations
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [nameFilter, setNameFilter] = useState('');
-  const [addedMessage, setaddedMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
 
 
@@ -44,6 +46,7 @@ const App = () => {
     if (!numberPattern.test(newNumber))
       return alert('Number can contain only digits and dashes.');
     
+
     // Check for existing name and update or create accordingly
     const existingPerson = persons.find(p => p.name === newName);
 
@@ -58,8 +61,8 @@ const App = () => {
           setPersons(persons.concat(returnedPerson));
           setNewName('');
           setNewNumber('');
-          setaddedMessage(`Added '${personObject.name}'`);
-          setTimeout(() => { setaddedMessage(null) }, 5000);
+          setSuccessMessage(`Added '${personObject.name}'`);
+          setTimeout(() => { setSuccessMessage(null) }, 5000);
         });
     }
   };
@@ -77,12 +80,16 @@ const App = () => {
           setPersons(persons.filter(p => p.id !== id));
         })
         .catch(error => {
-          console.error('Error deleting person:', error);
-          alert('This person was already deleted from the server');
+         // console.error('Error deleting person:', error);
+          setErrorMessage(`Information of ${person.name} has already been removed from server'`);
+          setTimeout(() => { setErrorMessage(null) }, 5000);
+          setPersons(persons.filter(p => p.id !== id));
         });
     }
   };
 
+
+  // Updating persons number logic
   const updatePerson = (id, newNumber) => {
     const personToUpdate = persons.find(p => p.id === id);
     const updatedPerson = { ...personToUpdate, number: newNumber };
@@ -93,10 +100,16 @@ const App = () => {
         setPersons(persons.map(p => p.id !== id ? p : returnedPerson));
         setNewName('');
         setNewNumber('');
+        setSuccessMessage(`Updated '${returnedPerson.name}'`);
+        setTimeout(() => { setSuccessMessage(null) }, 5000);
       })
       .catch(error => {
-        console.error('Error updating person:', error);
-        alert(`Error updating person`);
+        setNewName('');
+        setNewNumber('');
+        //console.error('Error updating person:', error);
+        setErrorMessage(`Information of ${personToUpdate.name} has already been removed from server`);
+        setTimeout(() => {setErrorMessage(null);}, 5000);
+        setPersons(persons.filter(p => p.id !== id));
      });
   };
 
@@ -112,7 +125,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={addedMessage} />
+      <Notification message={successMessage} type="success" />
+      <Notification message={errorMessage} type="error" />
       <Filter value={nameFilter} onChange={handleNameFilterChange} />
       
       <h2>Add a new</h2>
